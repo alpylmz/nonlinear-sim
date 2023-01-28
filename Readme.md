@@ -1,4 +1,4 @@
-% Van der Pol oscillator
+# Van der Pol oscillator
 
 This is a simple example of a Van der Pol oscillator.
 
