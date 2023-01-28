@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as anim
 from scipy.integrate import odeint
 
-MU = 0.1
+MU = 5.0
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
