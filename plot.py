@@ -1,39 +1,36 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as anim
-import logging as log
+from scipy.integrate import odeint
 
-# initialize a special logger
-logger = log.getLogger('nonlinear_plot')
-logger.setLevel(level=log.DEBUG)
+MU = 0.1
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-last_initial_point = [0, 0]
+clicked_point = [0, 0]
 
 def onclick(event):
-    global last_initial_point
-    last_initial_point[0] = event.xdata
-    last_initial_point[1] = event.ydata
-    logger.error("clicked: x: %s, y: %s", event.xdata, event.ydata)
-    pass
+    global clicked_point
+    clicked_point[0] = event.xdata
+    clicked_point[1] = event.ydata
+    print("clicked: x: %s, y: %s", event.xdata, event.ydata)
 
-cid = fig.canvas.mpl_connect('button_press_event', onclick)
+def van_der_pol_deriv(x, t):
+    dx0 = x[1]
+    dx1 = MU * (1 - x[0]**2) * x[1] - x[0]
+    return np.array([dx0, dx1])
 
 def update_plot(i):
+    coords = odeint(van_der_pol_deriv, clicked_point, np.linspace(0, 100.0, 1000))
+    coords = coords.tolist()
+    # clear the plot
     ax.clear()
-    plt.xlim(0, 10)
-    plt.ylim(0, 10)
-    ax.plot(
-        [last_initial_point[0], 
-        last_initial_point[0] + 1,
-        last_initial_point[0] + 2,
-        last_initial_point[0] + 3,], 
-        [last_initial_point[1], 
-        last_initial_point[1] + 1,
-        last_initial_point[1] + 2,
-        last_initial_point[1] + 3,])
-           
-a = anim.FuncAnimation(fig, update_plot, frames = 60)
+    # set the limits of the plot again
+    plt.xlim(-10, 10)
+    plt.ylim(-10, 10)
+    ax.plot([x[0] for x in coords], [x[1] for x in coords])
+
+cid = fig.canvas.mpl_connect('button_press_event', onclick)
+a = anim.FuncAnimation(fig, update_plot, frames = 1000)
 
 plt.show()
